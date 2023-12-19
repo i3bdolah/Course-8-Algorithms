@@ -60,13 +60,20 @@ void PrintMonthCalendar(int year, int month) {
 	}
 
 	printf("\n  _________________________________\n");
-}  
+}
+
+void PrintFullYearCalendar(int year) {
+	printf("\n  ________________________________\n\n");
+	printf("\n	_________Calendar Year__________\n\n");
+	printf("\n  ________________________________\n\n");
+
+	for (int month = 1; month <= 12; month++)
+	{
+		PrintMonthCalendar(year, month);
+	}
+}
 
 int main()
 {
-	int year = EnterInt("Enter The Year : ");
-	int month = EnterInt("Enter The Month [1-12] : ");
-
-	//PrintDateDetails(year, month);
-	PrintMonthCalendar(year, month);
+	PrintFullYearCalendar(EnterInt("Enter The Year : "));
 }

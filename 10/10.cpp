@@ -60,13 +60,36 @@ void PrintMonthCalendar(int year, int month) {
 	}
 
 	printf("\n  _________________________________\n");
-}  
+}
+
+void PrintFullYearCalendar(int year) {
+	printf("\n  ________________________________\n\n");
+	printf("\n	_________Calendar Year__________\n\n");
+	printf("\n  ________________________________\n\n");
+
+	for (int month = 1; month <= 12; month++)
+	{
+		PrintMonthCalendar(year, month);
+	}
+}
+
+void PrintTotalFromBeginning(int year, int month, int day) {
+	int TotalNumberOfDays = 0;
+	for (int currMonth = 1; currMonth < month; currMonth++)
+	{
+		TotalNumberOfDays += DaysInMonth(year, currMonth);
+	}
+	TotalNumberOfDays += day;
+
+	printf("Number Of Days form The Beginning of The Year is %d", TotalNumberOfDays);
+}
 
 int main()
 {
-	int year = EnterInt("Enter The Year : ");
-	int month = EnterInt("Enter The Month [1-12] : ");
+	printf("Kindly Enter The Following Information.\n");
+	int day =	EnterInt("Day   : ");
+	int month = EnterInt("Month : ");
+	int year =	EnterInt("Year  : ");
 
-	//PrintDateDetails(year, month);
-	PrintMonthCalendar(year, month);
-}
+	PrintTotalFromBeginning(year, month, day);
+}							
