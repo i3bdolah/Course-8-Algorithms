@@ -44,28 +44,29 @@ struct sDate
 	int daysAdded = 0;
 };
 
-void DateAfterDaysAdded(sDate& sDate) {
-	int tempDaysAdded = sDate.daysAdded;
+sDate DateAfterDaysAdded(sDate sDate) {
+	int DaysAdded = sDate.daysAdded;
 
-	while (tempDaysAdded != 0)
+	while (true)
 	{
-		sDate.days++;
+		int currMonthDays = DaysInMonth(sDate.years, sDate.months);
 
-		if (sDate.days > DaysInMonth(sDate.years, sDate.months))
+		if ((DaysAdded + sDate.days) > currMonthDays)
 		{
-			sDate.days = 1;
 			sDate.months++;
+			if (sDate.months > 12) {
+				sDate.months = 1;
+				sDate.years++;
+			}
+			DaysAdded -= currMonthDays;
 		}
-		if (sDate.months > 12) {
-			sDate.months = 1;
-			sDate.years++;
+		else
+		{
+			sDate.days += DaysAdded;
+			break;
 		}
-
-		tempDaysAdded--;
 	}
-
-	cout << "\nDate after adding [" << sDate.daysAdded << "] days is : ";
-	cout << sDate.days << "/" << sDate.months << "/" << sDate.years << endl;
+	return sDate;
 }
 
 int main()
@@ -77,5 +78,7 @@ int main()
 	sDate.years = EnterInt("Year: ");
 	sDate.daysAdded = EnterInt("Days to be added  : ");
 
-	DateAfterDaysAdded(sDate);
+	sDate = DateAfterDaysAdded(sDate);
+	cout << "\nDate after adding [" << sDate.daysAdded << "] days is : ";
+	cout << sDate.days << "/" << sDate.months << "/" << sDate.years << endl;
 }
