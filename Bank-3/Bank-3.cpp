@@ -54,14 +54,14 @@ struct stClient
 };
 
 struct stUserPermissions {
-	short IsShowAll = 0;
-	short IsAdd = 0;
-	short IsDelete = 0;
-	short IsUpdate = 0;
-	short IsFind = 0;
-	short IsTransaction = 0;
-	short IsManageUsers = 0;
-	int PermissionID = (IsShowAll + IsAdd + IsDelete + IsUpdate + IsFind + IsTransaction + IsManageUsers) == 127 ? -1 : (IsShowAll + IsAdd + IsDelete + IsUpdate + IsFind + IsTransaction + IsManageUsers);
+	//short IsShowAll = 0;
+	//short IsAdd = 0;
+	//short IsDelete = 0;
+	//short IsUpdate = 0;
+	//short IsFind = 0;
+	//short IsTransaction = 0;
+	//short IsManageUsers = 0;
+	int PermissionID = 0;
 };
 
 struct stUser
@@ -141,7 +141,7 @@ string ConvertRecordToLine(stUser user, string seperator = "#//#") {
 
 	tempRecord += user.Username + seperator;
 	tempRecord += user.Password + seperator;
-	tempRecord += to_string(user.Permissions.PermissionID) + seperator;
+	tempRecord += to_string(user.Permissions.PermissionID);
 
 	return tempRecord;
 }
@@ -723,52 +723,76 @@ vector <stUser> LoadAndStructurizeDataFromUsersFile(string FilePath) {
 
 stUserPermissions ReadUserPermissions() {
 	stUserPermissions per;
-	char userLetter;
+	char Letter;
 
 	cout << "\nDo you want to give Full Access [Y/N] : ";
-	cin >> (userLetter);
+	cin >> Letter;
 	cin.ignore();
-	if (toupper(userLetter) == 'Y') {
+
+
+	if (toupper(Letter) == 'Y') {
 		per.PermissionID = -1;
 		return per;
 	}
 	else
 	{
 		cout << "\n\n- Show Client List [Y/N] : ";
-		cin >> (userLetter);
+		cin >> Letter;
 		cin.ignore();
-		if (isupper(userLetter) == 'Y') per.IsShowAll = 1;
+		if (Letter == 'Y' || Letter == 'y') {
+			per.PermissionID += 1;
+		}
 
 		cout << "\n\n- Add Client[Y/N] : ";
-		cin >> (userLetter);
+		cin >> Letter;
 		cin.ignore();
-		if (isupper(userLetter) == 'Y') per.IsAdd = 2;
+
+		if (Letter == 'Y' || Letter == 'y') {
+			per.PermissionID += 2;
+		}
 
 		cout << "\n\n- Delete Client[Y/N] : ";
-		cin >> (userLetter);
+		cin >> Letter;
 		cin.ignore();
-		if (isupper(userLetter) == 'Y') per.IsDelete = 4;
+		if (Letter == 'Y' || Letter == 'y') {
+			per.PermissionID += 4;
+		}
 
 		cout << "\n\n- Update Client[Y/N] : ";
-		cin >> (userLetter);
+		cin >> Letter;
 		cin.ignore();
-		if (isupper(userLetter) == 'Y') per.IsUpdate = 8;
+		if (Letter == 'Y' || Letter == 'y') {
+			per.PermissionID += 8;
+		}
 
 		cout << "\n\n- Find Client[Y/N] : ";
-		cin >> (userLetter);
+		cin >> Letter;
 		cin.ignore();
-		if (isupper(userLetter) == 'Y') per.IsFind = 16;
+		if (Letter == 'Y' || Letter == 'y') {
+			per.PermissionID += 16;
+		}
 
 		cout << "\n\n- Transaction [Y/N] : ";
-		cin >> (userLetter);
+		cin >> Letter;
 		cin.ignore();
-		if (isupper(userLetter) == 'Y') per.IsTransaction = 32;
+		if (Letter == 'Y' || Letter == 'y') {
+			per.PermissionID += 32;
+		}
 
 		cout << "\n\n- Manage Users [Y/N] : ";
-		cin >> (userLetter);
+		cin >> Letter;
 		cin.ignore();
-		if (isupper(userLetter) == 'Y') per.IsManageUsers = 64;
+		if (Letter == 'Y' || Letter == 'y') {
+			per.PermissionID += 64;
+		}
+
 	}
+
+	if (per.PermissionID == 127)
+	{
+		per.PermissionID = -1;
+	}
+
 	return per;
 }
 
@@ -860,10 +884,17 @@ void DeleteUserFunc() {
 		system("cls"); // Clean Terminal
 		Headline("Delete Client");
 
-		string AccountNum = EnterString("Enter The Username : ");
+		string Username = EnterString("Enter The Username : ");
 
-		DeleteAndPrintTheUser(StructuresFromFile, AccountNum); // Deletion Process
-		SaveDataToFile(UsersFilePath, StructuresFromFile); // Sync Changes
+		if (Username == "Admin")
+		{
+			cout << "\n\n" << "You Cannot Delete The (Admin)." << "\n\n";
+		}
+		else
+		{
+			DeleteAndPrintTheUser(StructuresFromFile, Username); // Deletion Process
+			SaveDataToFile(UsersFilePath, StructuresFromFile); // Sync Changes
+		}
 
 		CheckCharInput(isContinued, "\n- Do you want to continue [Y / N] : ");
 	} while (toupper(isContinued) == 'Y');
@@ -1021,54 +1052,110 @@ void Login() {
 		system("cls"); // Clean Terminal
 		Headline("Login");
 		cout << "Wrong Credintials, Try Again...\n\n";
-		string Username = EnterString("Re-Enter The Username : ");
-		string Password = EnterString("Re-Enter The Password : ");
-		vector <stUser> StructuresFromFile = LoadAndStructurizeDataFromUsersFile(UsersFilePath);
+		Username = EnterString("Re-Enter The Username : ");
+		Password = EnterString("Re-Enter The Password : ");
+		//vector <stUser> StructuresFromFile = LoadAndStructurizeDataFromUsersFile(UsersFilePath);
 		IsUserExist = ValidateLogin(StructuresFromFile, Username, Password);
 	}
 	// Then
 	ClientOperations(StructuresFromFile[isAccountExist(StructuresFromFile, Username)]);
 }
 
+void AcceessDeniedMessage() {
+	system("cls"); // Clean Terminal
+	Headline("Access Denied!!!");
+	Headline("Access Denied!!!");
+	Headline("Access Denied!!!");
+	system("pause");
+}
+
 void DecisionsFlow(Operations EnteredNum, stUserPermissions userPer) {
 	switch (EnteredNum)
 	{
 	case Operations::ShowAll:
-		system("cls"); // Clean Terminal
-		Headline("Show Client List");
-		ReadClients();
-		system("pause");
+		if ((userPer.PermissionID & 1) == 0)
+		{
+			AcceessDeniedMessage();
+		}
+		else
+		{
+			system("cls"); // Clean Terminal
+			Headline("Show Client List");
+			ReadClients();
+			system("pause");
+		}
 		break;
 	case Operations::Add:
-		system("cls"); // Clean Terminal
-		Headline("Add Client");
-		AddClients();
+		if ((userPer.PermissionID & 2) == 0)
+		{
+			AcceessDeniedMessage();
+		}
+		else
+		{
+			system("cls"); // Clean Terminal
+			Headline("Add Client");
+			AddClients();
+		}
 		break;
 	case Operations::Delete:
-		system("cls"); // Clean Terminal
-		Headline("Delete Client");
-		DeleteClient();
+		if ((userPer.PermissionID & 4) == 0)
+		{
+			AcceessDeniedMessage();
+		}
+		else
+		{
+			system("cls"); // Clean Terminal
+			Headline("Delete Client");
+			DeleteClient();
+		}
 		break;
 	case Operations::Update:
-		system("cls"); // Clean Terminal
-		Headline("Update Client");
-		UpdateClient();
+		if ((userPer.PermissionID & 8) == 0) {
+			AcceessDeniedMessage();
+		}
+		else
+		{
+			system("cls"); // Clean Terminal
+			Headline("Update Client");
+			UpdateClient();
+		}
 		break;
 	case Operations::Find:
-		system("cls"); // Clean Terminal
-		Headline("Find Client");
-		FindClient();
-		system("pause");
+		if ((userPer.PermissionID & 16) == 0)
+		{
+			AcceessDeniedMessage();
+		}
+		else
+		{
+			system("cls"); // Clean Terminal
+			Headline("Find Client");
+			FindClient();
+			system("pause");
+		}
 		break;
 	case Operations::Transactions:
-		system("cls"); // Clean Terminal
-		Headline("Transactions");
-		ClientTransactions();
+		if ((userPer.PermissionID & 32) == 0)
+		{
+			AcceessDeniedMessage();
+		}
+		else
+		{
+			system("cls"); // Clean Terminal
+			Headline("Transactions");
+			ClientTransactions();
+		}
 		break;
 	case Operations::ManageUsers:
-		system("cls"); // Clean Terminal
-		Headline("Manage Users");
-		ManageUsersOperation();
+		if ((userPer.PermissionID & 64) == 0)
+		{
+			AcceessDeniedMessage();
+		}
+		else
+		{
+			system("cls"); // Clean Terminal
+			Headline("Manage Users");
+			ManageUsersOperation();
+		}
 		break;
 	case Operations::Logout:
 		system("cls"); // Clean Terminal
