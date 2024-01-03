@@ -228,7 +228,6 @@ void WithdrawLogic(int amount) {
 	if (CurrentClient.acc_balance < amount)
 	{
 		cout << "\nYour Balance is Less than the Withdrawal Amount.\nTry Less Amount...\n\n" << endl;
-		system("pause");
 	}
 	else
 	{
@@ -238,9 +237,9 @@ void WithdrawLogic(int amount) {
 			CurrentClient.acc_balance -= amount;
 			SyncCurrentUserChanges();
 			cout << "Withdraw Process Succeeded.\n\n" << endl;
-			system("pause");
 		}
 	}
+	system("pause");
 }
 
 void QuickWithdrawDecisionsFlow(QuickWithdrawOperations enteredNum) {
@@ -306,6 +305,48 @@ void QuickWithdraw() {
 	} while (EnteredNum != 9);
 }
 
+/////////////////////////////////////////////////////////////////
+
+void NormalWithdraw() {
+	int amount = 0;
+
+	cout << "Enter Multiple of 5's Amount : ";
+	cin >> amount;
+	cin.ignore();
+
+	if ((amount % 5 == 0) && (amount <= CurrentClient.acc_balance))
+	{
+		WithdrawLogic(amount);
+		cout << "\n" << "You've Withdrawed (" << amount << ") Successfully." << endl;
+	}
+	else
+	{
+		cout << "\n" << "Withdrawal Process Failed!\nMake Sure to follow the Guidelines." << endl;
+		system("pause");
+	}
+}
+
+/////////////////////////////////////////////////////////////////
+
+void Deposit() {
+	int amount = 0;
+
+	cout << "Enter Positive Amount : ";
+	cin >> amount;
+	cin.ignore();
+
+	if (amount > 0)
+	{
+		CurrentClient.acc_balance += amount;
+		cout << "\n" << "You've Deposited (" << amount << ") Successfully." << endl;
+		SyncCurrentUserChanges();
+	}
+	else
+	{
+		cout << "\n" << "Deposit Process Failed!\nMake Sure to follow the Guidelines." << endl;
+	}
+	system("pause");
+}
 
 /////////////////////////////////////////////////////////////////
 void CheckBalance() {
@@ -353,10 +394,12 @@ void MainDecisionsFlow(Operations EnteredNum) {
 	case Operations::enNormalWithdraw:
 		system("cls"); // Clean Terminal
 		Headline("Normal Withdraw");
+		NormalWithdraw();
 		break;
 	case Operations::enDeposit:
 		system("cls"); // Clean Terminal
 		Headline("Deposit");
+		Deposit();
 		break;
 	case Operations::enCheckBalance:
 		system("cls"); // Clean Terminal
@@ -376,7 +419,7 @@ void MainMenuOperations() {
 	{
 		system("cls");
 		Headline("ATM - Main Menu");
-		cout << "Good Morning, " << CurrentClient.name << " - " << CurrentClient.bank_acc << endl;
+		cout << "Good Morning, \n" << CurrentClient.name << " - " << CurrentClient.acc_balance << "\n\n";
 		cout << setw(10) << left << " " << "[1] Quick Withdraw" << endl;
 		cout << setw(10) << left << " " << "[2] Normal Withdraw" << endl;
 		cout << setw(10) << left << " " << "[3] Deposit" << endl;
